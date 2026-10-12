@@ -497,7 +497,6 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
             }}
             className="flex flex-col gap-1 bg-black/85 p-2.5 px-3.5 rounded-xl border border-cyan-400 text-white font-mono text-xs select-none shadow-2xl backdrop-blur-sm whitespace-nowrap z-20 mb-2"
           >
-            {/* ヘッダー風ラベル */}
             <div className="flex items-center gap-1.5 border-b border-zinc-800 pb-1 mb-0.5">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse" />
               <span className="text-cyan-500 font-bold tracking-wider text-[10px] uppercase">
@@ -505,8 +504,7 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
               </span>
             </div>
 
-            {/* ガイドテキスト本文 */}
-            <div className="text-zinc-600 font-medium">
+            <div className="text-zinc-600 font-medium whitespace-pre-wrap">
               {g.text}
             </div>
           </div>
