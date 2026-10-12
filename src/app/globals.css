@@ -10,10 +10,6 @@ html, body {
   overflow: hidden;
 }
 
-* {
-  white-space: pre-wrap;
-}
-
 #__next, [data-nextjs-scroll-focus-boundary] {
   height: 100%;
 }
