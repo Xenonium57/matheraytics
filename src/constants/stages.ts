@@ -26,7 +26,7 @@ export const STAGES: StageMap = {
         { x: 7.5, y: 3.5, text: "Gキーを押して式を表示し、\n直線の傾きを-1にしよう"},
       ],
     },
-    2: {
+    /*2: {
       id: 2,
       level: 2,
       stagePosition: {
@@ -40,7 +40,7 @@ export const STAGES: StageMap = {
       lasers: [
         { x: 7.5, y: 1.5, slope: 6, min: -10, max: 10 },
       ],
-    }
+    },*/
   }
 };
 
