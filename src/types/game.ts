@@ -21,6 +21,9 @@ export interface Box extends Rect {
   vy?: number;
 }
 
+export interface Laser extends Position {
+  slope: number;
+}
 
 export interface Guides extends Position {
   text: string;
