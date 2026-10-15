@@ -10,7 +10,7 @@ export const STAGES: StageMap = {
       id: 1,
       level: 1,
       stagePosition: {
-        start: {x: 0.5, y: 3.5},
+        start: {x: 1.5, y: 4.5},
         goal: {x: 10.5, y: 1.5}
       },
       platforms: [
@@ -22,7 +22,7 @@ export const STAGES: StageMap = {
         { x: 7.5, y: 1.5, slope: 1, min: -10, max: 10 },
       ],
       guides: [
-        { x: 3.5, y: 1.5, text: "触れると説明が\n表示されるよ" },
+        { x: 1.5, y: 1.5, text: "矢印キー又はWASDで移動\nRキーでリトライ" },
         { x: 7.5, y: 3.5, text: "Gキーを押して式を表示し、\n直線の傾きを-1にしよう"},
       ],
     },
