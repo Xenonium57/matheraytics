@@ -23,6 +23,8 @@ export interface Box extends Rect {
 
 export interface Laser extends Position {
   slope: number;
+  min: number;
+  max: number;
 }
 
 export interface Guides extends Position {
