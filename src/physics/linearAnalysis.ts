@@ -1,4 +1,5 @@
 import GAME_CONFIG from '@/constants/gameConfig';
+import { LinearConfig, LinearPointSlopeConfig, LinearSlopeYIntConfig, LinearTwoPointsConfig } from '@/types/game';
 
 const W = GAME_CONFIG.WORLD_W;
 const H = GAME_CONFIG.WORLD_H;
@@ -108,4 +109,42 @@ export function getLineProps(elements: basicInput | pointsInput | slopeInput): L
     }
   }
   return ret;
+}
+
+export function getLinePropsFromConfig(config: LinearConfig, inputs: Record<string, string>): LineModel | null {
+  try {
+    switch (config.mode) {
+      case 'point-slope': {
+        const slope = Number(inputs.slope ?? config.slope);
+        const x1 = Number(inpus.point_x ?? config.point.x);
+        const y1 = Number(inputs.point_y ?? config.point.y);
+
+        if (isNaN(slope) || isNaN(x1) || isNaN(y1)) return null;
+        return getLineProps({ slope, x1, y1 });
+      }
+
+      case 'slope-yint': {
+        const slope = Number(inputs.slope ?? config.slope);
+        const intercept = Number(inputs.intercept ?? config.intercept);
+
+        if (isNaN(slope) || isNaN(intercept)) return null;
+        return getLineProps({ slope, intercept });
+      }
+
+      case 'two-points': {
+        const x1 = Number(inputs.p1_x ?? config.p1.x);
+        const y1 = Number(inputs.p1_y ?? config.p1.y);
+        const x2 = Number(inputs.p2_x ?? config.p2.x);
+        const y2 = Number(inputs.p2_y ?? config.p2.y);
+
+        if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) return null;
+        return getLineProps({ x1, y1, x2, y2});
+      }
+
+      default:
+        return null;
+    }
+  } catch (e) {
+    return null;
+  }
 }
