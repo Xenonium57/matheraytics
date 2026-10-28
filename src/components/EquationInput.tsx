@@ -33,7 +33,7 @@ function AccordionItem({
         <span>■ {title}:</span>
       </div>
       {isOpen && (
-        <div className="pl-4 pt-1 text-zinc-700 flex flex-col gap-1">
+        <div className="pl-4 pt-1 text-zinc-700 flex flex-col gap-1 text-pre-wrap">
           {children}
         </div>
       )}
@@ -97,7 +97,7 @@ export default function EquationInput({ item, onSet, onShow }: EquationInputProp
             onBlur={() => setIsFocused(false)}
             onKeyDown={(e) => e.stopPropagation()} 
             onKeyUp={(e) => e.stopPropagation()} 
-            className="w-16 bg-zinc-800 border border-zinc-600 text-cyan-400 text-center rounded outline-none py-0.5 font-bold focus:border-cyan-400" 
+            className="equation-input equation-input-sm" 
           />
           <span>x + b</span>
         </div>
