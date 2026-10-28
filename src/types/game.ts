@@ -21,7 +21,7 @@ export interface Box extends Rect {
   vy?: number;
 }
 
-export interface Laser extends Position {
+export interface LaserLine extends Position {
   slope: number;
   min: number;
   max: number;
@@ -31,7 +31,7 @@ export interface Guides extends Position {
   text: string;
 }
 
-export interface Paramrule {
+export interface ParamRule {
   min?: number;
   max?: number;
   step?: number;
@@ -40,52 +40,57 @@ export interface Paramrule {
 
 export type FunctionType = 'linear' | 'quadratic' | 'circle';
 
-export interface LinearPointSlopeConfig {
+export interface BaseLaserItemConfig {
+  id: string;
+  inputs: Record<string, string>;
+}
+
+export interface LinearPointSlopeConfig extends BaseLaserItemConfig {
   type: 'linear';
   mode: 'point-slope';
   point: { x: number; y: number };
   slope: number;
-  fixedParams?: Array<'point' | 'slope'>;
-  paramRules?: {
-    slope?: Paramrule;
-    point_x?: Paramrule;
-    point_y?: Paramrule;
+  editableParams: Array<'slope' | 'point_x' | 'point_y'>;
+  ParamRules?: {
+    slope?: ParamRule;
+    point_x?: ParamRule;
+    point_y?: ParamRule;
   };
 }
 
-export interface LinearSlopeYIntConfig {
+export interface LinearSlopeYIntConfig extends BaseLaserItemConfig {
   type: 'linear';
   mode: 'slope-yint';
   slope: number;
   intercept: number;
-  fixedParams?: Array<'slope' | 'intercept'>;
-  paramRules?: {
-    slope?: Paramrule;
-    intercept?: Paramrule;
+  editableParams: Array<'slope' | 'intercept'>;
+  ParamRules?: {
+    slope?: ParamRule;
+    intercept?: ParamRule;
   }
 }
 
-export interface LinearTwoPointsConfig {
+export interface LinearTwoPointsConfig extends BaseLaserItemConfig {
   type: 'linear';
   mode: 'two-points';
   p1: { x: number; y: number };
   p2: { x: number; y: number };
-  fixedParams?: Array<'p1' | 'p2'>;
-  paramRules?: {
-    point1_x?: Paramrule;
-    point1_y?: Paramrule;
-    point2_x?: Paramrule;
-    point2_y?: Paramrule;
+  editableParams: Array<'p1_x' | 'p1_y' | 'p2_x' | 'p2_y'>;
+  ParamRules?: {
+    p1_x?: ParamRule;
+    p1_y?: ParamRule;
+    p2_x?: ParamRule;
+    p2_y?: ParamRule;
   }
 }
 
-export type LinearLaserConfig =
+export type LinearConfig =
   | LinearPointSlopeConfig
   | LinearSlopeYIntConfig
   | LinearTwoPointsConfig;
 
 export type LaserConfig =
-  | LinearLaserConfig;
+  | LinearConfig;
 
 export interface StageConfig {
   id: number;
@@ -95,10 +100,11 @@ export interface StageConfig {
     goal: Position;
   };
   platforms: Platform[];
-  lasers: Laser[];
+  lasers: LaserLine[];
   guides?: Guides[];
 }
 
+/* 移替え終了後削除 */
 export interface MovableUiItem {
   id: string;
   type: 'equation';
@@ -112,3 +118,4 @@ export interface MovableUiItem {
     intercept: number;
   };
 }
+/**/
