@@ -46,16 +46,17 @@ let setSetTimeoutId: NodeJS.Timeout;
 export default function EquationInput({ item, onSet, onShow }: EquationInputProps) {
   const { x, y } = item.target;
   const { slope, intercept } = item.prevValues;
-  const [inputSlope, setInputSlope] = useState(String(slope));
+  const [inputs, setInputs] = useState<Record<string, string>>({slope: String(slope)});
   const [isSetError, setIsSetError] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
-    setInputSlope(String(slope));
+    setInputs((prev) => ({ ...inputs, 'slope': slope }));
   }, [slope]);
 
-  const handleInputChange = (value: string) => {
-    setInputSlope(value);
+  const handleInputChange = (key: string, value: string) => {
+    const nextInputs = { ...inputs, [key]: value };
+    setInputs(nextInputs);
     if (value.trim() === "" || value === "-" || isNaN(Number(value))) return;
     if (GAME_CONFIG.ENABLE_PREVIEW) {
       onShow(value);
@@ -69,11 +70,11 @@ export default function EquationInput({ item, onSet, onShow }: EquationInputProp
   };
 
   const handleSet = () => {
-    if (inputSlope.trim() === "" || isNaN(Number(inputSlope))) {
+    if (inputs.slope.trim() === "" || isNaN(Number(inputs.slope))) {
       triggerSetError();
       return;
     }
-    if (onSet(inputSlope)) {
+    if (onSet(inputs.slope)) {
       triggerSetError();
     }
   };
@@ -91,8 +92,8 @@ export default function EquationInput({ item, onSet, onShow }: EquationInputProp
           <span>y = </span>
           <input 
             type="text" 
-            value={inputSlope} 
-            onChange={(e) => handleInputChange(e.target.value)} 
+            value={inputs.slope ?? ''} 
+            onChange={(e) => handleInputChange('slope', e.target.value)} 
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             onKeyDown={(e) => e.stopPropagation()} 
