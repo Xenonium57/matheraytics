@@ -2,6 +2,9 @@ import * as PIXI from 'pixi.js';
 import GAME_CONFIG from '@/constants/gameConfig';
 import { getStageConfig } from '@/constants/stages';
 import { checkCircleCollision, checkLaserHit, isRectColliding } from '@/physics/collisionUtils';
+import { getLinePropsFromConfig } from '@/physics/linearAnalysis';
+import { LaserConfig } from '@/types/game';
+import { getLaserTargetPoint } from '@/utils/laser';
 
 const TS = GAME_CONFIG.TILE_SIZE;
 
@@ -26,7 +29,7 @@ export default function updateGame({
   xGridTexts,
   yGridTexts,
   uiLayerRef,
-  uiItems,
+  lasers,
   createExplosion,
   setIsUiVisible,
   guideElementsRef,
@@ -47,7 +50,7 @@ export default function updateGame({
   xGridTexts: PIXI.Container;
   yGridTexts: PIXI.Container;
   uiLayerRef: React.RefObject<HTMLDivElement | null>;
-  uiItems: any[];
+  lasers: LaserConfig[];
   createExplosion: (options: {
     x: number, y: number, count?: number, gravity?: number, color?: number, isRainbow?: boolean
   }) => void;
@@ -129,21 +132,28 @@ export default function updateGame({
 
   if (isGoalRef.current) return;
 
-  const currentData = laserRef.current ? (laserRef.current as any).currentData : null;
-  if (
-    currentData &&
-    checkLaserHit(currentData.slope, currentData.intercept, p)
-  ) {
-    isAliveRef.current = false;
-    box.visible = false;
-    createExplosion({x: p.x, y: p.y});
-    return;
+  for (const laser of lasers) {
+    const lineProps = getLinePropsFromConfig(laser, laser.inputs);
+    if (!lineProps) continue;
+
+    if (checkLaserHit(lineProps.slope, lineProps.intercept, p)) {
+      isAliveRef.current = false;
+      box.visible = false;
+      createExplosion({ x: p.x, y: p.y });
+      return;
+    }
   }
 
   if (STAGE.guides && guideElementsRef?.current) {
     STAGE.guides.forEach((g, index) => {
       const el = guideElementsRef.current?.[index];
       if (!el) return;
+  
+      const screenX = Math.round(g.x * TS + world.x);
+      const screenY = Math.round(world.y - (g.y + 0.5) * TS);
+  
+      el.style.transform = `translate(${screenX}px, ${screenY}px) translate(-50%, -100%)`;
+  
       const isNear = checkCircleCollision(p, g);
       el.style.opacity = isNear ? '1' : '0';
     });
@@ -170,17 +180,4 @@ export default function updateGame({
 
   xGridTexts.y = world.y - GAME_CONFIG.VIEW_H * TS;
   yGridTexts.x = -world.x;
-
-  if (uiLayerRef.current) {
-    const htmlElements = uiLayerRef.current.children;
-
-    uiItems.forEach((item, index) => {
-      const el = htmlElements[index] as HTMLDivElement;
-      if (!el) return;
-
-      const targetX = Math.round(item.target.x * TS + world.x);
-      const targetY = Math.round(world.y - item.target.y * TS);
-      el.style.transform = `translate(${targetX}px, ${targetY}px)`;
-    });
-  }
 }

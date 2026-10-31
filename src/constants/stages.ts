@@ -1,6 +1,6 @@
 import GAME_CONFIG from '@/constants/gameConfig'
 import { StageConfig } from '@/types/game'
-
+import { addLaserInputs } from '@/utils/laser'
 
 export type StageMap = Record<number, Record<number, StageConfig>>;
 
@@ -19,7 +19,14 @@ export const STAGES: StageMap = {
         { x: 7, y: 2, w: 1, h: 1 },
       ],
       lasers: [
-        { x: 7.5, y: 1.5, slope: 1, min: -10, max: 10 },
+        addLaserInputs({
+          id: 'laser',
+          type: 'linear',
+          mode: 'slope-point',
+          slope: 1,
+          point: { x: 7.5, y: 1.5 },
+          editableParams: ['slope'],
+        }),
       ],
       guides: [
         { x: 1.5, y: 1.5, text: "矢印キー又はWASDで移動\nRキーでリトライ" },

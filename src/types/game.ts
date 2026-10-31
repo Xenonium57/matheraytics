@@ -45,11 +45,11 @@ export interface BaseLaserItemConfig {
   inputs: Record<string, string>;
 }
 
-export interface LinearPointSlopeConfig extends BaseLaserItemConfig {
+export interface LinearSlopePointConfig extends BaseLaserItemConfig {
   type: 'linear';
-  mode: 'point-slope';
-  point: { x: number; y: number };
+  mode: 'slope-point';
   slope: number;
+  point: { x: number; y: number };
   editableParams: Array<'slope' | 'point_x' | 'point_y'>;
   ParamRules?: {
     slope?: ParamRule;
@@ -85,7 +85,7 @@ export interface LinearTwoPointsConfig extends BaseLaserItemConfig {
 }
 
 export type LinearConfig =
-  | LinearPointSlopeConfig
+  | LinearSlopePointConfig
   | LinearSlopeYIntConfig
   | LinearTwoPointsConfig;
 
@@ -103,19 +103,3 @@ export interface StageConfig {
   lasers: LaserLine[];
   guides?: Guides[];
 }
-
-/* 移替え終了後削除 */
-export interface MovableUiItem {
-  id: string;
-  type: 'equation';
-  target: Position;
-  range: { min: number; max: number };
-  inputs: {
-    slope: string;
-  };
-  prevValues: {
-    slope: number;
-    intercept: number;
-  };
-}
-/**/

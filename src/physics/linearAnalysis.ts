@@ -1,5 +1,5 @@
 import GAME_CONFIG from '@/constants/gameConfig';
-import { LinearConfig, LinearPointSlopeConfig, LinearSlopeYIntConfig, LinearTwoPointsConfig } from '@/types/game';
+import { LinearConfig, LinearSlopePointConfig, LinearSlopeYIntConfig, LinearTwoPointsConfig } from '@/types/game';
 
 const W = GAME_CONFIG.WORLD_W;
 const H = GAME_CONFIG.WORLD_H;
@@ -111,12 +111,15 @@ export function getLineProps(elements: basicInput | pointsInput | slopeInput): L
   return ret;
 }
 
-export function getLinePropsFromConfig(config: LinearConfig, inputs: Record<string, string>): LineModel | null {
+export function getLinePropsFromConfig(
+  config: LinearConfig,
+  inputs: Record<string, string> = config.inputs ?? {}
+  ): LineModel | null {
   try {
     switch (config.mode) {
-      case 'point-slope': {
+      case 'slope-point': {
         const slope = Number(inputs.slope ?? config.slope);
-        const x1 = Number(inpus.point_x ?? config.point.x);
+        const x1 = Number(inputs.point_x ?? config.point.x);
         const y1 = Number(inputs.point_y ?? config.point.y);
 
         if (isNaN(slope) || isNaN(x1) || isNaN(y1)) return null;

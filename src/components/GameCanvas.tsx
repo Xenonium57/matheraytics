@@ -8,9 +8,10 @@ import GAME_CONFIG from '@/constants/gameConfig';
 import { getStageConfig } from '@/constants/stages';
 import updateGame from '@/game/core/updateGame';
 import { GridRenderer } from '@/game/renderers/gridRenderer';
-import { getLineProps } from '@/physics/linearAnalysis';
-import { MovableUiItem } from '@/types/game';
+import { getLinePropsFromConfig } from '@/physics/linearAnalysis';
+import { LaserConfig, MovableUiItem } from '@/types/game';
 import { createGlowMarker } from '@/utils/createGlowMarker';
+import { updateLaserFromInputs } from '@/utils/laser';
 
 const TS = GAME_CONFIG.TILE_SIZE;
 
@@ -38,10 +39,11 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
   const [isUiVisible, setIsUiVisible] = useState<boolean>(false);
   const keysRef = useRef<{ [key: string]: boolean }>({});
   const laserRef = useRef<PIXI.Graphics | null>(null);
+  const [lasers, setLasers] = useState<LaserConfig[]>([]);
+  const lasersRef = useRef<LaserConfig[]>([]);
   const previewLaserRef = useRef<PIXI.Graphics | null>(null);
   const prevKeysRef = useRef<{ [key: string]: boolean }>({});
   const timeRef = useRef<number>(0);
-  const [uiItems, setUiItems] = useState<MovableUiItem[]>([]);
   const uiLayerRef = useRef<HTMLDivElement>(null);
 
   const isValidInput = (input: string, min: number, max: number) => {
@@ -55,95 +57,88 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
     return true;
   }
 
-  const updateLasersRender = (items: MovableUiItem[]) => {
+  const updateLasersRender = (configs: LaserConfig[]) => {
     if (!laserRef.current) return;
 
-    laserRef.current.clear();
+    const g = laserRef.current;
+    g.clear();
 
-    items.forEach((item, index) => {
-      const { slope, intercept } = item.prevValues;
-      const newLineProps = getLineProps({ slope, intercept });
+    configs.forEach((config, index) => {
+      const newLineProps = getLinePropsFromConfig(config);
+      if (!newLineProps) return;
       
       const isFocused = index === activeIndex;
 
-      laserRef.current!
-        .moveTo(newLineProps.x1 * TS, newLineProps.y1 * TS)
-        .lineTo(newLineProps.x2 * TS, newLineProps.y2 * TS)
-        .stroke({ 
+      g.moveTo(newLineProps.x1 * TS, newLineProps.y1 * TS)
+       .lineTo(newLineProps.x2 * TS, newLineProps.y2 * TS)
+       .stroke({
           width: isFocused ? 7 : 5,
           color: isFocused ? 0xff0044 : 0xff0000,
-          alpha: 1.0
+          alpha: 1.0,
         });
 
       if (isFocused) {
-        (laserRef.current as any).currentData = { slope, intercept };
+        (g as unknown as { currentData: Record<string, string> }).currentData = config.inputs;
       }
     });
   };
 
   const handlePrev = () => {
-    if (uiItems.length === 0) return;
-    setActiveIndex(prev => (prev - 1 + uiItems.length) % uiItems.length);
+    if (lasers.length === 0) return;
+    setActiveIndex(prev => (prev - 1 + lasers.length) % lasers.length);
   };
 
   const handleNext = () => {
-    if (uiItems.length === 0) return;
-    setActiveIndex(prev => (prev + 1) % uiItems.length);
+    if (lasers.length === 0) return;
+    setActiveIndex(prev => (prev + 1) % lasers.length);
   };
 
-  const handleSetEquation = (item: MovableUiItem, slopeStr: string) => {
-    if (!isValidInput(slopeStr, item.range.min, item.range.max)) return true;
-
-    const nextSlope = Number(slopeStr);
-    const { x, y } = item.target;
-    const nextIntercept = y - (nextSlope * x);
-
+  const handleSetEquation = (id: string, inputs: Record<string, string>): boolean => {
     if (previewLaserRef.current) {
       previewLaserRef.current.clear();
     }
-
-    setUiItems(prev => prev.map(u =>
-      u.id === item.id
-      ? {
-        ...u,
-        prevValues: {
-          slope: nextSlope,
-          intercept: nextIntercept
-        }
-      }
-      : u
-    ));
-  };
-
-  const handleShowPreview = (item: MovableUiItem, slopeStr: string) => {
-    if (!isValidInput(slopeStr, item.range.min, item.range.max)) return true;
-
-    const nextSlope = Number(slopeStr);
-    const { x, y } = item.target;
-    const nextIntercept = y - (nextSlope * x);
+    
+    setLasers((prev) =>
+      prev.map((laser) => (laser.id === id ? updateLaserFromInputs(laser, inputs) : laser))
+    );
   
-    if (previewLaserRef.current) {
-      try {
-        const lineProps = getLineProps({ slope: nextSlope, intercept: nextIntercept });
-        
-        previewLaserRef.current.clear();
-        previewLaserRef.current
-          .moveTo(lineProps.x1 * TS, lineProps.y1 * TS)
-          .lineTo(lineProps.x2 * TS, lineProps.y2 * TS)
-          .stroke({ width: 3, color: 0xffaa00, alpha: 0.7 });
-  
-        (previewLaserRef.current as any).dashPattern = [12, 8];
-        return false;
-      } catch (e) {
-        return true;
-      }
-    }
     return false;
   };
 
+  const handleShowPreview = (id: string, inputs: Record<string, string>): boolean => {
+    if (!previewLaserRef.current) return false;
+  
+    const targetLaser = lasers.find((l) => l.id === id);
+    if (!targetLaser) return true;
+  
+    try {
+      const tempConfig = updateLaserFromInputs(targetLaser, inputs);
+      const lineProps = getLinePropsFromConfig(tempConfig);
+  
+      if (!lineProps) return true;
+  
+      const g = previewLaserRef.current;
+      g.clear();
+      g.moveTo(lineProps.x1 * TS, lineProps.y1 * TS)
+       .lineTo(lineProps.x2 * TS, lineProps.y2 * TS)
+       .stroke({ 
+         width: 3, 
+         color: 0xffaa00, 
+         alpha: 0.7 
+       });
+  
+      return false;
+    } catch (e) {
+      return true;
+    }
+  };
+
   useEffect(() => {
-    updateLasersRender(uiItems);
-  }, [activeIndex, uiItems]);
+    lasersRef.current = lasers;
+    if (lasers.length > 0) {
+      updateLasersRender(lasers);
+    }
+  }, [activeIndex, lasers]);
 
   useEffect(() => {
     let isMounted = true;
@@ -228,9 +223,9 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
       };
 
       if (guides) {
-        guideElementsRef.current = new Array(guides.length).fill(null);
+        guideElementsRef.current = guideElementsRef.current.slice(0, guides.length);
         guides.forEach((g) => {
-          world.addChild(createGlowMarker({x: g.x, y: g.y}));
+          world.addChild(createGlowMarker({ x: g.x, y: g.y }));
         });
       }
 
@@ -241,18 +236,9 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
       world.addChild(pLaser);
       previewLaserRef.current = pLaser;
 
-      const initialItems: MovableUiItem[] = LASERS.map((laserConfig) => {
-        const intercept = laserConfig.y - (laserConfig.slope * laserConfig.x);
-        return {
-          id: crypto.randomUUID(),
-          type: 'equation',
-          target: { x: laserConfig.x, y: laserConfig.y },
-          range: { min: laserConfig.min ?? GAME_CONFIG.DEFAULT_RANGE.MIN, max: laserConfig.max ?? GAME_CONFIG.DEFAULT_RANGE.MAX },
-          inputs: { slope: "" },
-          prevValues: { slope: laserConfig.slope, intercept: intercept },
-        };
-      });
-      setUiItems(initialItems);
+      const InitialLasers = LASERS.map((laserConfig) => laserConfig);
+      lasersRef.current = InitialLasers;
+      setLasers(InitialLasers);
 
       const laserGfx = new PIXI.Graphics();
       laserGfx.filters = [
@@ -372,7 +358,7 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
         updateGame({
           dt, stage, level, playerState, keys: keysRef.current, prevKeys: prevKeysRef.current,
           isAliveRef, box, laserRef, gridRef, world, xGridTexts, yGridTexts,
-          uiLayerRef, uiItems, createExplosion, setIsUiVisible, guideElementsRef, isGoalRef, onGoal
+          uiLayerRef, lasers: lasersRef.current, createExplosion, setIsUiVisible, guideElementsRef, isGoalRef, onGoal
         });
       
         prevKeysRef.current = { ...keysRef.current };
@@ -440,7 +426,7 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
             >
               ◀
             </button>
-            <span>LASER {activeIndex + 1}/{uiItems.length}</span>
+            <span>LASER {activeIndex + 1}/{lasers.length}</span>
             <button 
               onClick={handleNext} 
               style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#00ffff', fontWeight: 'bold' }}
@@ -450,13 +436,13 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
           </div>
         )}
 
-        {isUiVisible && uiItems.map((item, index) => {
+        {isUiVisible && lasers.map((laser, index) => {
           if (index !== activeIndex) return null;
 
           return (
             <div 
-              key={item.id}
-              data-id={item.id}
+              key={laser.id}
+              data-id={laser.id}
               style={{ 
                 position: 'absolute', 
                 top: '50px', 
@@ -467,14 +453,14 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
                 whiteSpace: 'nowrap'
               }}
             >
-              {item.type === 'equation' && (
+              {laser.type === 'linear' && (
                 <EquationInput
-                  item={item}
-                  onSet={(slope: string) => {
-                    handleSetEquation(item, slope);
+                  config={laser}
+                  onSet={(inputs) => {
+                    handleSetEquation(laser.id, inputs);
                     return false;
                   }}
-                  onShow={(slope: string) => handleShowPreview(item, slope)}
+                  onShow={(inputs) => handleShowPreview(laser.id, inputs)}
                 />
               )}
             </div>
@@ -484,13 +470,14 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
           <div
             key={index}
             ref={(el) => {
-              guideElementsRef.current[index] = el;
+              if (guideElementsRef.current) {
+                guideElementsRef.current[index] = el;
+              }
             }}
             style={{
               position: 'absolute',
-              left: `${g.x * TS}px`,
-              top: `${(GAME_CONFIG.VIEW_H - g.y - 1) * TS}px`,
-              transform: 'translate(-50%, -100%)',
+              left: 0,
+              top: 0,
               opacity: 0,
               transition: 'opacity 0.2s ease-in-out',
               pointerEvents: 'none',
