@@ -1,6 +1,6 @@
 import { LaserConfig } from '@/types/game';
 
-export function addLaserInputs<T extends LaserConfig>(config: Omit<T, 'inputs'>): T {
+export function addLaserInputs(config: Omit<LaserConfig, 'inputs'>): LaserConfig {
   let inputs: Record<string, string> = {};
 
   switch (config.type) {
@@ -21,10 +21,10 @@ export function addLaserInputs<T extends LaserConfig>(config: Omit<T, 'inputs'>)
           break;
         case 'two-points':
           inputs = {
-            p1_x: String(config.p1_x),
-            p1_y: String(config.p1_y),
-            p2_x: String(config.p2_x),
-            p2_y: String(config.p2_y)
+            p1_x: String(config.p1.x),
+            p1_y: String(config.p1.y),
+            p2_x: String(config.p2.x),
+            p2_y: String(config.p2.y)
           };
           break;
       }
@@ -39,7 +39,7 @@ export function addLaserInputs<T extends LaserConfig>(config: Omit<T, 'inputs'>)
   };
 }
 
-export function addLasersInputs<T extends LaserConfig>(configs: Omit<T, 'inputs'>[]): T[] {
+export function addLasersInputs(configs: Omit<LaserConfig, 'inputs'>[]): LaserConfig[] {
   return configs.map((config) => addLaserInputs(config));
 }
 
