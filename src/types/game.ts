@@ -86,7 +86,7 @@ export type LinearConfig =
 export type LaserConfig =
   | LinearConfig;
 
-export type OmitInputs<T> = T extends any ? Omit<T, 'inputs'> : never;
+export type OmitInputs<T> = T extends any ? Omit<T, 'id' | 'inputs'> : never;
 
 export type RawLaserConfig = OmitInputs<LaserConfig> & { id?: string };
 
