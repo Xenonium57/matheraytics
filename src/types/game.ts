@@ -21,12 +21,6 @@ export interface Box extends Rect {
   vy?: number;
 }
 
-export interface LaserLine extends Position {
-  slope: number;
-  min: number;
-  max: number;
-}
-
 export interface Guides extends Position {
   text: string;
 }
@@ -100,6 +94,6 @@ export interface StageConfig {
     goal: Position;
   };
   platforms: Platform[];
-  lasers: LaserLine[];
+  lasers: LaserConfig[];
   guides?: Guides[];
 }
