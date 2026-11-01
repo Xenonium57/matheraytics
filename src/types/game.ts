@@ -86,6 +86,10 @@ export type LinearConfig =
 export type LaserConfig =
   | LinearConfig;
 
+export type OmitInputs<T> = T extends any ? Omit<T, 'inputs'> : never;
+
+export type RawLaserConfig = OmitInputs<LaserConfig>;
+
 export interface StageConfig {
   id: number;
   level: number;
