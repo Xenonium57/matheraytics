@@ -88,7 +88,7 @@ export type LaserConfig =
 
 export type OmitInputs<T> = T extends any ? Omit<T, 'inputs'> : never;
 
-export type RawLaserConfig = OmitInputs<LaserConfig>;
+export type RawLaserConfig = OmitInputs<LaserConfig> & { id?: string };
 
 export interface StageConfig {
   id: number;

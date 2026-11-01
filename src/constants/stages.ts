@@ -19,7 +19,6 @@ export const STAGES: StageMap = {
         { x: 7, y: 2, w: 1, h: 1 },
       ],
       lasers: addLasersInputs([{
-          id: 'laser',
           type: 'linear',
           mode: 'slope-point',
           slope: 1,

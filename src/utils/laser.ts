@@ -1,6 +1,6 @@
 import { RawLaserConfig, LaserConfig } from '@/types/game';
 
-export function addLaserInputs(config: RawLaserConfig): LaserConfig {
+export function addLaserInputs(config: RawLaserConfig, fallbackId?: string): LaserConfig {
   let inputs: Record<string, string> = {};
 
   switch (config.type) {
@@ -32,46 +32,54 @@ export function addLaserInputs(config: RawLaserConfig): LaserConfig {
   }
   return {
     ...config,
+    id: config.id ?? fallbackId ?? `laser-${crypto.randomUUID}`,
     inputs,
   };
 }
 
 export function addLasersInputs(configs: RawLaserConfig[]): LaserConfig[] {
-  return configs.map((config) => addLaserInputs(config));
+  return configs.map((config, index) =>
+    addLaserInputs(config, config.id ?? `lasers-${index + 1}`)
+  );
 }
 
-export function updateLaserFromInputs<T extends LaserConfig>(laser: T, inputs: Record<string, string>): T {
+export function updateLaserFromInputs<T extends LaserConfig>(laser: T, newInputs: Record<string, string>): T {
+  const mergedInputs = {
+    ...laser.inputs,
+    ...newInputs,
+  };
+
   if (laser.type === 'linear') {
     switch (laser.mode) {
       case 'slope-point':
         return {
           ...laser,
-          slope: Number(inputs.slope ?? laser.slope),
+          slope: Number(mergedInputs.slope ?? laser.slope),
           point: {
-            x: Number(inputs.point_x ?? laser.point.x),
-            y: Number(inputs.point_y ?? laser.point.y),
+            x: Number(mergedInputs.point_x ?? laser.point.x),
+            y: Number(mergedInputs.point_y ?? laser.point.y),
           },
-          inputs,
+          inputs: mergedInputs,
         };
       case 'slope-yint':
         return {
           ...laser,
-          slope: Number(inputs.slope ?? laser.slope),
-          intercept: Number(inputs.intercept ?? laser.intercept),
-          inputs,
+          slope: Number(mergedInputs.slope ?? laser.slope),
+          intercept: Number(mergedInputs.intercept ?? laser.intercept),
+          inputs: mergedInputs,
         };
       case 'two-points':
         return {
           ...laser,
           p1: {
-            x: Number(inputs.p1_x ?? laser.p1.x),
-            y: Number(inputs.p1_y ?? laser.p1.y),
+            x: Number(mergedInputs.p1_x ?? laser.p1.x),
+            y: Number(mergedInputs.p1_y ?? laser.p1.y),
           },
           p2: {
-            x: Number(inputs.p2_x ?? laser.p2.x),
-            y: Number(inputs.p2_y ?? laser.p2.y),
+            x: Number(mergedInputs.p2_x ?? laser.p2.x),
+            y: Number(mergedInputs.p2_y ?? laser.p2.y),
           },
-          inputs,
+          inputs: mergedInputs,
         };
     }
   }

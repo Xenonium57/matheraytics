@@ -113,9 +113,14 @@ export function getLineProps(elements: basicInput | pointsInput | slopeInput): L
 
 export function getLinePropsFromConfig(
   config: LinearConfig,
-  inputs: Record<string, string> = config.inputs ?? {}
+  customInputs: Record<string, string> = config.inputs ?? {}
   ): LineModel | null {
   try {
+    const inputs = {
+      ...config.inputs,
+      ...customInputs,
+    };
+
     switch (config.mode) {
       case 'slope-point': {
         const slope = Number(inputs.slope ?? config.slope);
