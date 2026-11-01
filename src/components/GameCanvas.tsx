@@ -46,7 +46,7 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
   const timeRef = useRef<number>(0);
   const uiLayerRef = useRef<HTMLDivElement>(null);
 
-  const isValidInput = (input: string, min: number, max: number) => {
+  const isValidInput = (input: string, min = -100, max = 100) => {
     if (
       isNaN(Number(input)) ||
       !isFinite(Number(input)) ||
@@ -68,6 +68,9 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
   };
 
   const handleSetEquation = (id: string, inputs: Record<string, string>): boolean => {
+    const allValid = Object.values(inputs).every((val) => isValidInput(val));
+    if (!allValid) return true;
+
     if (previewLaserRef.current) {
       previewLaserRef.current.clear();
     }
@@ -81,6 +84,9 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
 
   const handleShowPreview = (id: string, inputs: Record<string, string>): boolean => {
     if (!previewLaserRef.current) return false;
+
+    const allValid = Object.values(inputs).every((val) => isValidInput(val));
+    if (!allValid) return true;
   
     const targetLaser = lasers.find((l) => l.id === id);
     if (!targetLaser) return true;
@@ -340,8 +346,6 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
       app.ticker.add((ticker) => {
         const dt = ticker.deltaTime;
         timeRef.current += dt / 60;
-
-
 
         particles = particles.filter((pt) => {
           pt.display.x += pt.vx * dt;

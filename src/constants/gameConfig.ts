@@ -11,7 +11,7 @@ const GAME_CONFIG = {
   VIEW_W: 12,
   VIEW_H: 8,
   WORLD_W: 20,
-  WORLD_H: 15,
+  WORLD_H: 30,
   DEFAULT_RANGE: {
     MIN: -10000,
     MAX: 10000

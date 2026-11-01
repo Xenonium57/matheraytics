@@ -4,9 +4,9 @@ import { useState } from 'react';
 import GameCanvas from '@/components/GameCanvas';
 import { isExistStage } from '@/constants/stages';
 
-export default function GameScreen() {
-  const [stage, setStage] = useState(1);
-  const [level, setLevel] = useState(1);
+export default function GameScreen({initialStage = 1, initialLevel= 1 }: {initialStage?: number, initialLevel?: number}) {
+  const [stage, setStage] = useState(initialStage);
+  const [level, setLevel] = useState(initialLevel);
 
   const [fadeOpacity, setFadeOpacity] = useState(0);
 
