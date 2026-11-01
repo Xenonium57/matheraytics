@@ -34,7 +34,30 @@ export const STAGES: StageMap = {
       id: 2,
       level: 2,
       stagePosition: {
-        start: {x: 2.5, y: 1.5},
+        start: {x: 1.5, y: 4.5},
+        goal: {x: 10.5, y: 1.5}
+      },
+      platforms: [
+        { x: 0, y: 0, w: GAME_CONFIG.WORLD_W, h: 1, color: 0x66f47c},
+        { x: 6, y: 1, w: 3, h: 1 },
+        { x: 7, y: 2, w: 1, h: 1 },
+      ],
+      lasers: addLasersInputs([{
+          type: 'linear',
+          mode: 'slope-point',
+          slope: 1,
+          point: { x: 7.5, y: 1.5 },
+          editableParams: ['point_x'],
+        },
+      ]),
+      guides: [
+        { x: 1.5, y: 1.5, text: "入力は-100以上100以下" },
+      ],
+    }, 3: {
+      id: 3,
+      level: 3,
+      stagePosition: {
+        start: {x: 1.5, y: 4.5},
         goal: {x: 10.5, y: 1.5}
       },
       platforms: [
@@ -48,13 +71,18 @@ export const STAGES: StageMap = {
           slope: 1,
           point: { x: 7.5, y: 1.5 },
           editableParams: ['slope'],
+        }, {
+          type: 'linear',
+          mode: 'slope-point',
+          slope: 1,
+          point: { x: 7.5, y: 1.5 },
+          editableParams: ['point_y'],
         },
       ]),
       guides: [
-        { x: 2.5, y: 1.5, text: "入力は-100以上100以下" },
+        { x: 1.5, y: 1.5, text: "上の矢印で\nレーザーを切り替えよう" },
       ],
-    },
-    10: {
+    }, 10: {
       id: 10,
       level: 10,
       stagePosition: {
