@@ -1,6 +1,6 @@
 import GAME_CONFIG from '@/constants/gameConfig'
 import { StageConfig } from '@/types/game'
-import { addLaserInputs } from '@/utils/laser'
+import { addLasersInputs } from '@/utils/laser'
 
 export type StageMap = Record<number, Record<number, StageConfig>>;
 
@@ -18,16 +18,15 @@ export const STAGES: StageMap = {
         { x: 6, y: 1, w: 3, h: 1 },
         { x: 7, y: 2, w: 1, h: 1 },
       ],
-      lasers: [
-        addLaserInputs({
+      lasers: addLasersInputs([{
           id: 'laser',
           type: 'linear',
           mode: 'slope-point',
           slope: 1,
           point: { x: 7.5, y: 1.5 },
           editableParams: ['slope'],
-        }),
-      ],
+        },
+      ]),
       guides: [
         { x: 1.5, y: 1.5, text: "矢印キー又はWASDで移動\nRキーでリトライ" },
         { x: 7.5, y: 3.5, text: "Gキーを押して式を表示し、\n直線の傾きを-1にしよう"},
@@ -45,16 +44,15 @@ export const STAGES: StageMap = {
         { x: 6, y: 1, w: 3, h: 1 },
         { x: 7, y: 2, w: 1, h: 1 },
       ],
-      lasers: [
-        addLaserInputs({
+      lasers: addLasersInputs([{
           id: 'laser',
           type: 'linear',
           mode: 'slope-point',
           slope: 1,
           point: { x: 7.5, y: 1.5 },
           editableParams: ['slope'],
-        }),
-      ],
+        },
+      ]),
       guides: [
         { x: 1.5, y: 1.5, text: "矢印キー又はWASDで移動\nRキーでリトライ" },
         { x: 7.5, y: 3.5, text: "Gキーを押して式を表示し、\n直線の傾きを-1にしよう"},

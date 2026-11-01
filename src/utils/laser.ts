@@ -1,6 +1,6 @@
 import { LaserConfig } from '@/types/game';
 
-export function addLaserInputs<T extends LaserConfig>(config: T): T {
+export function addLaserInputs<T extends LaserConfig>(config: Omit<T, 'inputs'>): T {
   let inputs: Record<string, string> = {};
 
   switch (config.type) {
@@ -37,6 +37,10 @@ export function addLaserInputs<T extends LaserConfig>(config: T): T {
       ...config.inputs,
     },
   };
+}
+
+export function addLasersInputs<T extends LaserConfig>(configs: Omit<T, 'inputs'>[]): T[] {
+  return configs.map((config) => addLaserInputs(config));
 }
 
 export function updateLaserFromInputs<T extends LaserConfig>(laser: T, inputs: Record<string, string>): T {
