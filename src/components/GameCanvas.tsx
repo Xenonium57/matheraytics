@@ -9,7 +9,7 @@ import { getStageConfig } from '@/constants/stages';
 import updateGame from '@/game/core/updateGame';
 import { GridRenderer } from '@/game/renderers/gridRenderer';
 import { getLinePropsFromConfig } from '@/physics/linearAnalysis';
-import { LaserConfig, MovableUiItem } from '@/types/game';
+import { LaserConfig } from '@/types/game';
 import { createGlowMarker } from '@/utils/createGlowMarker';
 import { updateLaserFromInputs } from '@/utils/laser';
 
@@ -56,32 +56,6 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
     ) return false;
     return true;
   }
-
-  const updateLasersRender = (configs: LaserConfig[]) => {
-    if (!laserRef.current) return;
-
-    const g = laserRef.current;
-    g.clear();
-
-    configs.forEach((config, index) => {
-      const newLineProps = getLinePropsFromConfig(config);
-      if (!newLineProps) return;
-      
-      const isFocused = index === activeIndex;
-
-      g.moveTo(newLineProps.x1 * TS, newLineProps.y1 * TS)
-       .lineTo(newLineProps.x2 * TS, newLineProps.y2 * TS)
-       .stroke({
-          width: isFocused ? 7 : 5,
-          color: isFocused ? 0xff0044 : 0xff0000,
-          alpha: 1.0,
-        });
-
-      if (isFocused) {
-        (g as unknown as { currentData: Record<string, string> }).currentData = config.inputs;
-      }
-    });
-  };
 
   const handlePrev = () => {
     if (lasers.length === 0) return;
@@ -134,6 +108,32 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
   };
 
   useEffect(() => {
+    const updateLasersRender = (configs: LaserConfig[]) => {
+      if (!laserRef.current) return;
+  
+      const g = laserRef.current;
+      g.clear();
+  
+      configs.forEach((config, index) => {
+        const newLineProps = getLinePropsFromConfig(config);
+        if (!newLineProps) return;
+        
+        const isFocused = index === activeIndex;
+  
+        g.moveTo(newLineProps.x1 * TS, newLineProps.y1 * TS)
+         .lineTo(newLineProps.x2 * TS, newLineProps.y2 * TS)
+         .stroke({
+            width: isFocused ? 7 : 5,
+            color: isFocused ? 0xff0044 : 0xff0000,
+            alpha: 1.0,
+          });
+  
+        if (isFocused) {
+          (g as unknown as { currentData: Record<string, string> }).currentData = config.inputs;
+        }
+      });
+    };
+
     lasersRef.current = lasers;
     if (lasers.length > 0) {
       updateLasersRender(lasers);
@@ -142,6 +142,7 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
 
   useEffect(() => {
     let isMounted = true;
+    const container = containerRef.current;
 
     const handleKeyDown = (e: KeyboardEvent) => { keysRef.current[e.code] = true; };
     const handleKeyUp = (e: KeyboardEvent) => { keysRef.current[e.code] = false; };
@@ -385,10 +386,11 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
         app.destroy(true, { children: true, texture: true });
       }
 
-      if (containerRef.current) {
-        containerRef.current.innerHTML = '';
+      if (container) {
+        container.innerHTML = '';
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage, level]);
 
   return (

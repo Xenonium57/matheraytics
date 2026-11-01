@@ -33,31 +33,45 @@ export const STAGES: StageMap = {
         { x: 7.5, y: 3.5, text: "Gキーを押して式を表示し、\n直線の傾きを-1にしよう"},
       ],
     },
-    /*2: {
+    2: {
       id: 2,
       level: 2,
       stagePosition: {
-        start: {x: 0.5, y: 3.5},
+        start: {x: 1.5, y: 4.5},
         goal: {x: 10.5, y: 1.5}
       },
       platforms: [
         { x: 0, y: 0, w: GAME_CONFIG.WORLD_W, h: 1, color: 0x66f47c},
         { x: 6, y: 1, w: 3, h: 1 },
+        { x: 7, y: 2, w: 1, h: 1 },
       ],
       lasers: [
-        { x: 7.5, y: 1.5, slope: 6, min: -10, max: 10 },
+        addLaserInputs({
+          id: 'laser',
+          type: 'linear',
+          mode: 'slope-point',
+          slope: 1,
+          point: { x: 7.5, y: 1.5 },
+          editableParams: ['slope'],
+        }),
       ],
-    },*/
+      guides: [
+        { x: 1.5, y: 1.5, text: "矢印キー又はWASDで移動\nRキーでリトライ" },
+        { x: 7.5, y: 3.5, text: "Gキーを押して式を表示し、\n直線の傾きを-1にしよう"},
+      ],
+    }
   }
 };
 
-export const getStageConfig = (level: number, stage: number): StageConfig => {
-  const stageData = STAGES[level]?.[stage];
-  
-  if (!stageData) {
-    console.warn(`Stage (Level ${level}, Stage ${stage}) not found. Falling back to Level 1, Stage 1.`);
+export const isExistStage = (stage: number, level: number): boolean => {
+  return stage in STAGES && level in STAGES[stage];
+};
+
+export const getStageConfig = (stage: number, level: number): StageConfig => {  
+  if (!isExistStage(stage, level)) {
+    console.warn(`Stage (Stage ${stage}, Level ${level}) not found. Falling back to Level 1, Stage 1.`);
     return STAGES[1][1];
   }
   
-  return stageData;
+  return STAGES[stage][level];
 };
