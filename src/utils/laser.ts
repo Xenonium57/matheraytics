@@ -32,10 +32,7 @@ export function addLaserInputs(config: RawLaserConfig): LaserConfig {
   }
   return {
     ...config,
-    inputs: {
-      ...inputs,
-      ...config.inputs,
-    },
+    inputs,
   };
 }
 
