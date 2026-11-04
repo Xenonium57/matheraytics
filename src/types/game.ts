@@ -52,9 +52,9 @@ export interface LinearSlopePointConfig extends BaseLaserItemConfig {
   };
 }
 
-export interface LinearSlopeYIntConfig extends BaseLaserItemConfig {
+export interface LinearSlopeInterceptConfig extends BaseLaserItemConfig {
   type: 'linear';
-  mode: 'slope-yint';
+  mode: 'slope-intercept';
   slope: number;
   intercept: number;
   editableParams: Array<'slope' | 'intercept'>;
@@ -80,7 +80,7 @@ export interface LinearTwoPointsConfig extends BaseLaserItemConfig {
 
 export type LinearConfig =
   | LinearSlopePointConfig
-  | LinearSlopeYIntConfig
+  | LinearSlopeInterceptConfig
   | LinearTwoPointsConfig;
 
 export type LaserConfig =

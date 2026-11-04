@@ -40,11 +40,37 @@ function ParamInput({
   );
 }
 
+function getInitialInputs(config: LaserConfig): Record<string, string> {
+  if (config.mode === 'slope-point') {
+    return {
+      slope: String(config.slope),
+      point_x: String(config.point.x),
+      point_y: String(config.point.y),
+      ...config.inputs,
+    };
+  } else if (config.mode === 'slope-intercept') {
+    return {
+      slope: String(config.slope),
+      intercept: String(config.intercept),
+      ...config.inputs,
+    }
+  } else if (config.mode === 'two-points') {
+    return {
+      p1_x: String(config.p1.x),
+      p1_y: String(config.p1.y),
+      p2_x: String(config.p2.x),
+      p2_y: String(config.p2.y),
+      ...config.inputs,
+    }
+  }
+  return config.inputs ?? {};
+}
+
 function AccordionItem({ 
   title, 
   colorClass = "text-zinc-600", 
   defaultOpen = false, 
-  children 
+  children
 }: { 
   title: string; 
   colorClass?: string; 
@@ -74,29 +100,12 @@ function AccordionItem({
 let setSetTimeoutId: NodeJS.Timeout;
 
 export default function EquationInput({ config, onSet, onShow }: EquationInputProps) {
-  const [inputs, setInputs] = useState<Record<string, string>>(() => {
-    if (config.mode === 'slope-point') {
-      return {
-        slope: String(config.slope),
-        point_x: String(config.point.x),
-        point_y: String(config.point.y),
-        ...config.inputs,
-      };
-    }
-    return config.inputs ?? {};
-  });
+  const [inputs, setInputs] = useState<Record<string, string>>(() => getInitialInputs(config));
   const [isSetError, setIsSetError] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
-    if (config.mode === 'slope-point') {
-      setInputs({
-        slope: String(config.slope),
-        point_x: String(config.point.x),
-        point_y: String(config.point.y),
-        ...config.inputs,
-      });
-    }
+    setInputs(getInitialInputs(config));
   }, [config]);
 
   const handleInputChange = (key: string, value: string) => {
@@ -130,6 +139,26 @@ export default function EquationInput({ config, onSet, onShow }: EquationInputPr
     }
   };
 
+  const renderInput = (
+    paramKey: string,
+    getFallbackValue: () => number | string
+  ) => {
+    const isEditable = config.editableParams.includes(paramKey);
+
+    if (isEditable) {
+      return (
+        <ParamInput
+          paramKey={paramKey}
+          value={inputs[paramKey] ?? ''}
+          onChange={handleInputChange}
+          setIsFocused={setIsFocused}
+        />
+      );
+    }
+
+    return <span>{getFallbackValue()}</span>
+  };
+
   const lineModel = getLinePropsFromConfig(config);
   const a = lineModel?.slope ?? 0;
   const b = lineModel?.intercept ?? 0;
@@ -144,7 +173,7 @@ export default function EquationInput({ config, onSet, onShow }: EquationInputPr
     >
       <AccordionItem title="式" colorClass="text-emerald-600" defaultOpen={true}>
         <div>
-          y = {a === 1 ? '' : a === -1 ? '-' : a}x {b === 0 ? '' : b > 0 ? `+ ${b}` : `- ${Math.abs(b)}`}
+          y = {a === 0 ? b : `${a === 1 ? '' : a === -1 ? '-' : a}x ` + `${b === 0 ? '' : b > 0 ? `+ ${b}` : `- ${Math.abs(b)}`}`}
         </div>
       </AccordionItem>
 
@@ -156,42 +185,45 @@ export default function EquationInput({ config, onSet, onShow }: EquationInputPr
           {config.mode === 'slope-point' && (
             <>
             <div className="flex items-center gap-1">
-              <span>・傾きa = </span>
-              {config.editableParams.includes('slope') ? (
-                <ParamInput
-                paramKey="slope"
-                value={inputs.slope}
-                onChange={handleInputChange}
-                setIsFocused={setIsFocused}
-                />
-              ) : (
-                <span>{config.slope}</span>
-              )}
+              <span>・傾き</span>
+              {renderInput('slope', () => config.slope ?? 0)}
             </div>
             <div className="flex items-center gap-1">
-              <span>・点P(</span>
-              {config.editableParams.includes('point_x') ? (
-                <ParamInput
-                paramKey="point_x"
-                value={inputs.point_x}
-                onChange={handleInputChange}
-                setIsFocused={setIsFocused}
-              />
-              ) : (
-                <span>{config.point.x}</span>
-              )}
+              <span>・(</span>
+              {renderInput('point_x', () => config.point?.x ?? 0)}
               <span>, </span>
-              {config.editableParams.includes('point_y') ? (
-                <ParamInput
-                paramKey="point_y"
-                value={inputs.point_y}
-                onChange={handleInputChange}
-                setIsFocused={setIsFocused}
-                />
-              ) : (
-                <span>{config.point.y}</span>
-              )}
-              <span> )</span>
+              {renderInput('point_y', () => config.point?.y ?? 0)}
+              <span> )を通る</span>
+            </div>
+            </>
+          )}
+          {config.mode === 'slope-intercept' && (
+            <>
+            <div className="flex items-center gap-1">
+              <span>・傾き</span>
+              {renderInput('slope', () => config.slope ?? 0)}
+            </div>
+            <div className="flex items-center gap-1">
+              <span>・切片</span>
+              {renderInput('intercept', () => config.intercept ?? 0)}
+            </div>
+            </>
+          )}
+          {config.mode === 'two-points' && (
+            <>
+            <div className="flex items-center gap-1">
+              <span>・(</span>
+              {renderInput('p1_x', () => config.p1?.x ?? 0)}
+              <span>, </span>
+              {renderInput('p1_y', () => config.p1?.y ?? 0)}
+              <span>)を通る</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span>・(</span>
+              {renderInput('p2_x', () => config.p2?.x ?? 0)}
+              <span>, </span>
+              {renderInput('p2_y', () => config.p2?.y ?? 0)}
+              <span>)を通る</span>
             </div>
             </>
           )}
@@ -201,12 +233,28 @@ export default function EquationInput({ config, onSet, onShow }: EquationInputPr
       <hr className="border-zinc-800" />
 
       <AccordionItem title="詳細">
-        {config.mode === 'slope-point' &&(
+        {config.mode === 'slope-point' && (
           <div className="flex flex-col gap-0.5">
-            <div>y - P.y = a(x - P.x)</div>
-            <div>P.x = {config.point.x}</div>
-            <div>P.y = {config.point.y}</div>
+            <div>y - P<sub>y</sub> = a(x - P<sub>x</sub>)</div>
+            <div>P<sub>x</sub> = {config.point.x}</div>
+            <div>P<sub>y</sub> = {config.point.y}</div>
             <div>a = {a}</div>
+          </div>
+        )}
+        {config.mode === 'slope-intercept' && (
+          <div className="flex flex-col gap-0.5">
+            <div>y = ax + b</div>
+            <div>a = {a}</div>
+            <div>b = {b}</div>
+          </div>
+        )}
+        {config.mode === 'two-points' && (
+          <div className="flex flex-col gap-0.5">
+            <div>(Q<sub>x</sub> - P<sub>x</sub>)(y - P<sub>y</sub>)=(Q<sub>y</sub> - P<sub>y</sub>)(x - P<sub>x</sub>)</div>
+            <div>P<sub>x</sub> = {config.p1.x}</div>
+            <div>P<sub>y</sub> = {config.p1.y}</div>
+            <div>Q<sub>x</sub> = {config.p2.x}</div>
+            <div>Q<sub>y</sub> = {config.p2.y}</div>
           </div>
         )}
       </AccordionItem>

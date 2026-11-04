@@ -1,5 +1,5 @@
 import GAME_CONFIG from '@/constants/gameConfig';
-import { LinearConfig, LinearSlopePointConfig, LinearSlopeYIntConfig, LinearTwoPointsConfig } from '@/types/game';
+import { LinearConfig, LinearSlopePointConfig, LinearSlopeInterceptConfig, LinearTwoPointsConfig } from '@/types/game';
 
 const W = GAME_CONFIG.WORLD_W;
 const H = GAME_CONFIG.WORLD_H;
@@ -131,7 +131,7 @@ export function getLinePropsFromConfig(
         return getLineProps({ slope, x1, y1 });
       }
 
-      case 'slope-yint': {
+      case 'slope-intercept': {
         const slope = Number(inputs.slope ?? config.slope);
         const intercept = Number(inputs.intercept ?? config.intercept);
 

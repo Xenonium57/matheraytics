@@ -13,7 +13,7 @@ export function addLaserInputs(config: RawLaserConfig, fallbackId?: string): Las
             point_y: String(config.point.y)
           };
           break;
-        case 'slope-yint':
+        case 'slope-intercept':
           inputs = {
             slope: String(config.slope),
             intercept: String(config.intercept)
@@ -61,7 +61,7 @@ export function updateLaserFromInputs<T extends LaserConfig>(laser: T, newInputs
           },
           inputs: mergedInputs,
         };
-      case 'slope-yint':
+      case 'slope-intercept':
         return {
           ...laser,
           slope: Number(mergedInputs.slope ?? laser.slope),
@@ -92,7 +92,7 @@ export function getLaserTargetPoint(config: LaserConfig): { x: number; y: number
       case 'slope-point':
         return config.point;
 
-      case 'slope-yint':
+      case 'slope-intercept':
         return { x: 0, y: config.intercept };
 
       case 'two-points':
