@@ -143,7 +143,7 @@ export default function EquationInput({ config, onSet, onShow }: EquationInputPr
     paramKey: string,
     getFallbackValue: () => number | string
   ) => {
-    const isEditable = config.editableParams.includes(paramKey);
+    const isEditable = (config.editableParams as string[]).includes(paramKey);
 
     if (isEditable) {
       return (
