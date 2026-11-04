@@ -43,27 +43,27 @@ function ParamInput({
 function getInitialInputs(config: LaserConfig): Record<string, string> {
   if (config.mode === 'slope-point') {
     return {
-      slope: String(config.slope),
-      point_x: String(config.point.x),
-      point_y: String(config.point.y),
+      slope: String(config.slope ?? 0),
+      point_x: String(config.point.x ?? 0),
+      point_y: String(config.point.y ?? 0),
       ...config.inputs,
     };
   } else if (config.mode === 'slope-intercept') {
     return {
-      slope: String(config.slope),
-      intercept: String(config.intercept),
+      slope: String(config.slope ?? 0),
+      intercept: String(config.intercept ?? 0),
       ...config.inputs,
     }
   } else if (config.mode === 'two-points') {
     return {
-      p1_x: String(config.p1.x),
-      p1_y: String(config.p1.y),
-      p2_x: String(config.p2.x),
-      p2_y: String(config.p2.y),
+      p1_x: String(config.p1.x ?? 0),
+      p1_y: String(config.p1.y ?? 0),
+      p2_x: String(config.p2.x ?? 0),
+      p2_y: String(config.p2.y ?? 0),
       ...config.inputs,
     }
   }
-  return config.inputs ?? {};
+  return (config as { inputs?: Record<string, string> }).inputs ?? {};
 }
 
 function AccordionItem({ 
