@@ -369,7 +369,7 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
         updateGame({
           dt, stage, level, playerState, keys: keysRef.current, prevKeys: prevKeysRef.current,
           isAliveRef, box, laserRef, gridRef, world, xGridTexts, yGridTexts,
-          uiLayerRef, lasers: lasersRef.current, setLasers, createExplosion, setIsUiVisible, guideElementsRef, isGoalRef, onGoal, handleReset
+          uiLayerRef, lasers: lasersRef.current, createExplosion, setIsUiVisible, guideElementsRef, isGoalRef, onGoal, handleReset
         });
       
         prevKeysRef.current = { ...keysRef.current };
