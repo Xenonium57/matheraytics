@@ -1,7 +1,7 @@
 'use client';
 
 import * as PIXI from 'pixi.js';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import EquationInput from '@/components/EquationInput';
 import GAME_CONFIG from '@/constants/gameConfig';
@@ -112,6 +112,12 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
       return true;
     }
   };
+
+  const handleReset = useCallback(() => {
+    setLasers(structuredClone(STAGE.lasers));
+    //setPreviewLineProps?.(null);
+    //setIsSetError?.(false);
+  }, [STAGE]);
 
   useEffect(() => {
     const updateLasersRender = (configs: LaserConfig[]) => {
@@ -363,7 +369,7 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
         updateGame({
           dt, stage, level, playerState, keys: keysRef.current, prevKeys: prevKeysRef.current,
           isAliveRef, box, laserRef, gridRef, world, xGridTexts, yGridTexts,
-          uiLayerRef, lasers: lasersRef.current, createExplosion, setIsUiVisible, guideElementsRef, isGoalRef, onGoal
+          uiLayerRef, lasers: lasersRef.current, setLasers, createExplosion, setIsUiVisible, guideElementsRef, isGoalRef, onGoal, handleReset
         });
       
         prevKeysRef.current = { ...keysRef.current };

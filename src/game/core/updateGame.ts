@@ -35,6 +35,7 @@ export default function updateGame({
   guideElementsRef,
   isGoalRef,
   onGoal,
+  handleReset,
 }: {
   dt: number;
   stage: number;
@@ -58,6 +59,7 @@ export default function updateGame({
   guideElementsRef: React.RefObject<(HTMLDivElement | null)[]>;
   isGoalRef: React.MutableRefObject<boolean>;
   onGoal: () => void;
+  handleReset: () => void;
 }) {
   const config = GAME_CONFIG.PHYSICS;
   const STAGE = getStageConfig(stage, level);
@@ -82,6 +84,7 @@ export default function updateGame({
       gridRef.current.yTexts.visible = false;
       setIsUiVisible(false);
     }
+    handleReset?.();
     return;
   }
 
