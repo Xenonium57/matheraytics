@@ -67,28 +67,33 @@ export function getLineProps(elements: basicInput | pointsInput | slopeInput): L
     ret.intercept = !isFinite(ret.slope) ? elements.x1 : elements.y1 - ret.slope * elements.x1;
   }
 
-  if (ret.slope === Infinity) {
+  const MIN_X = -GAME_CONFIG.WORLD_W;
+  const MAX_X =  GAME_CONFIG.WORLD_W;
+  const MIN_Y = -GAME_CONFIG.WORLD_H;
+  const MAX_Y =  GAME_CONFIG.WORLD_H;
+
+  if (!isFinite(ret.slope)) {
     ret.x1 = ret.intercept;
-    ret.y1 = 0;
+    ret.y1 = MIN_Y;
     ret.x2 = ret.intercept;
-    ret.y2 = H;
+    ret.y2 = MAX_Y;
   } else if (ret.slope === 0) {
-    ret.x1 = 0;
+    ret.x1 = MIN_X;
     ret.y1 = ret.intercept;
-    ret.x2 = W;
+    ret.x2 = MAX_X;
     ret.y2 = ret.intercept;
   } else {
-    const l = expectLineIntersect(ret.slope, ret.intercept, Infinity, 0);
-    const r = expectLineIntersect(ret.slope, ret.intercept, Infinity, GAME_CONFIG.WORLD_W);
-    const d = expectLineIntersect(ret.slope, ret.intercept, 0, 0);
-    const u = expectLineIntersect(ret.slope, ret.intercept, 0, GAME_CONFIG.WORLD_H);
+    const l = expectLineIntersect(ret.slope, ret.intercept, Infinity, MIN_X);
+    const r = expectLineIntersect(ret.slope, ret.intercept, Infinity, MAX_X);
+    const d = expectLineIntersect(ret.slope, ret.intercept, 0, MIN_Y);
+    const u = expectLineIntersect(ret.slope, ret.intercept, 0, MIN_Y);
 
     const candidates = [l, r, d, u];
 
     const EPS = 0.01;
     const inBoundsPoints = candidates.filter(p => 
-      p.x >= 0 - EPS && p.x <= W + EPS &&
-      p.y >= 0 - EPS && p.y <= H + EPS
+      p.x >= MIN_X - EPS && p.x <= MAX_X + EPS &&
+      p.y >= MIN_Y - EPS && p.y <= MAX_Y + EPS
     );
 
     const validPoints: typeof inBoundsPoints = [];

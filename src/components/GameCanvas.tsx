@@ -142,6 +142,9 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
   
         if (isFocused) {
           (g as unknown as { currentData: Record<string, string> }).currentData = config.inputs;
+          if (config.type === 'linear' && config.mode === 'slope-intercept') {
+            //pass
+          }
         }
       });
     };
@@ -202,7 +205,7 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
 
       PLATFORMS.forEach((p) => {
         const gfx = new PIXI.Graphics()
-          .rect(0, -p.h, p.w * TS, p.h * TS)
+          .rect(0, 0, p.w * TS, p.h * TS)
           .fill(p.color ?? 0x000000);
         gfx.x = p.x * TS;
         gfx.y = p.y * TS;
@@ -283,7 +286,7 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
       });
 
       const xGridTexts = new PIXI.Container();
-      for (let i = 1; i <= GAME_CONFIG.WORLD_W; i++) {
+      for (let i = -GAME_CONFIG.WORLD_W; i <= GAME_CONFIG.WORLD_W; i++) {
         const text = new PIXI.Text({ text: String(i), style });
         text.anchor.set(0.5);
         text.x = i * TS;
@@ -294,7 +297,7 @@ export default function GameCanvas({ stage, level, onGoal }: { stage: number, le
       world.addChild(xGridTexts);
 
       const yGridTexts = new PIXI.Container();
-      for (let i = 1; i <= GAME_CONFIG.WORLD_H; i++) {
+      for (let i = -GAME_CONFIG.WORLD_H; i <= GAME_CONFIG.WORLD_H; i++) {
         const text = new PIXI.Text({ text: String(i), style });
         text.anchor.set(0.5);
         text.x = 0.5 * TS;

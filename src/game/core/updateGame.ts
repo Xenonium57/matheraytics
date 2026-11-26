@@ -126,9 +126,9 @@ export default function updateGame({
     if (!isGoalRef.current && (triggeredKeys['Space'] || triggeredKeys['ArrowUp'] || triggeredKeys['KeyW'])) p.vy = config.JUMP_FORCE;
   }
   
-  if (p.x - p.w < 0) { p.x = p.w; p.vx = 0; }
-  if (p.x + p.w > GAME_CONFIG.WORLD_W) { p.x = GAME_CONFIG.WORLD_W - p.w; p.vx = 0; }
-  if (p.y + p.h > GAME_CONFIG.WORLD_H) { p.y = GAME_CONFIG.WORLD_H - p.h; p.vy = 0; }
+  if (p.x - p.w < -GAME_CONFIG.WORLD_W) { p.x = -GAME_CONFIG.WORLD_W;       p.vx = 0; }
+  if (p.x + p.w >  GAME_CONFIG.WORLD_W) { p.x =  GAME_CONFIG.WORLD_W - p.w; p.vx = 0; }
+  if (p.y + p.h >  GAME_CONFIG.WORLD_H) { p.y =  GAME_CONFIG.WORLD_H - p.h; p.vy = 0; }
 
   box.x = p.x * TS;
   box.y = p.y * TS;
@@ -177,9 +177,9 @@ export default function updateGame({
   }
 
   world.x += (GAME_CONFIG.VIEW_W * TS / 2 - box.x - world.x) * 0.1;
-  world.y += (GAME_CONFIG.VIEW_H * TS / 2 + box.y - world.y) * 0.1;
-  world.x = Math.min(Math.max(world.x, -(GAME_CONFIG.WORLD_W - GAME_CONFIG.VIEW_W) * TS), 0);
-  world.y = Math.min(Math.max(world.y, GAME_CONFIG.VIEW_H * TS), GAME_CONFIG.WORLD_H * TS);
+  world.y += (GAME_CONFIG.VIEW_H * TS * (2 / 3) + box.y - world.y) * 0.1;
+  world.x = Math.min(Math.max(world.x, p.w * TS - box.x), GAME_CONFIG.VIEW_W * TS - p.w * TS - box.x);
+  world.y = Math.min(Math.max(world.y, p.h * TS + box.y), GAME_CONFIG.VIEW_H * TS - p.h * TS + box.y);
 
   xGridTexts.y = world.y - GAME_CONFIG.VIEW_H * TS;
   yGridTexts.x = -world.x;
