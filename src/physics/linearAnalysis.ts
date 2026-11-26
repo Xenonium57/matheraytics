@@ -86,7 +86,7 @@ export function getLineProps(elements: basicInput | pointsInput | slopeInput): L
     const l = expectLineIntersect(ret.slope, ret.intercept, Infinity, MIN_X);
     const r = expectLineIntersect(ret.slope, ret.intercept, Infinity, MAX_X);
     const d = expectLineIntersect(ret.slope, ret.intercept, 0, MIN_Y);
-    const u = expectLineIntersect(ret.slope, ret.intercept, 0, MIN_Y);
+    const u = expectLineIntersect(ret.slope, ret.intercept, 0, MAX_Y);
 
     const candidates = [l, r, d, u];
 
